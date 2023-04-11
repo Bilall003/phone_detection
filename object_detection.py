@@ -16,26 +16,46 @@ net.setInputMean((127.5, 127.5, 127.5))
 net.setInputSwapRB(True)
 
 # Getting frame from webcam
-    
+thres = 0.6 # Threshold to detect object
+
+def detect_faces(img):
+    return False
+
+
 while True:
     _, image = cap.read()
 
-
-
-    thres = 0.5 # Threshold to detect object
     classIds, confs, bbox = net.detect(image,confThreshold=thres)
-    print(classIds,bbox)
+
+    list_of_people = []
 
     if len(classIds) != 0:
         for classId, confidence,box in zip(classIds.flatten(),confs.flatten(),bbox):
-            start = False
-            cv2.rectangle(image,box,color=(0,255,0),thickness=2)
-            cv2.putText(image,classNames[classId-1].upper(),(box[0]+10,box[1]+30),
-            cv2.FONT_HERSHEY_COMPLEX,1,(0,255,0),2)
-            cv2.putText(image,str(round(confidence*100,2)),(box[0]+200,box[1]+30),
-            cv2.FONT_HERSHEY_COMPLEX,1,(0,255,0),2)
+            if classId == 1:
+                
+
+                top = box[0]
+                left = box[1]
+
+                bottom = top+box[2]
+                right = left+box[3]
+
+                img = image[left:right,top:bottom]
+
+                found = detect_faces(img)
+
+                if found:
+                    cv2.rectangle(image,box,color=(0,255,0),thickness=2)
+                else:
+                    cv2.rectangle(image,box,color=(0,0,255),thickness=2)
 
 
+
+                cv2.imshow('cropped',img)
+                cv2.waitKey()
+                # list_of_people.append(img)
     
-    cv2.imshow('Live camera',image)
-    cv2.waitKey(1)
+
+
+    # cv2.imshow('Live camera',image)
+    # cv2.waitKey(1)
